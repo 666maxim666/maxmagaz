@@ -1,480 +1,489 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>MaxMagaz — Telegram Аккаунты и Stars</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Orbitron:wght@700;900&display=swap" rel="stylesheet" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MaxMagaz | Telegram Аккаунты и Stars</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@600&display=swap" rel="stylesheet">
     <style>
+        /* СБРОС И БАЗОВЫЕ СТИЛИ */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
         body {
-            background: #0A0A0A;
-            color: #E0E0E0;
             font-family: 'Inter', sans-serif;
-            line-height: 1.6;
-            padding: 0 20px;
+            background-color: #060b14; /* Глубокий темный фон */
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(0, 150, 255, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 85% 30%, rgba(255, 200, 0, 0.05) 0%, transparent 40%);
+            color: #ffffff;
+            min-height: 100vh;
+            padding: 20px;
         }
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        /* ТЕКСТОВЫЙ ЛОГОТИП */
+        .logo {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 28px;
+            font-weight: 600;
+            letter-spacing: -1px;
+            background: linear-gradient(135deg, #00e5ff, #007bff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: inline-block;
+            margin-bottom: 40px;
+        }
+
+        /* ГЛАВНЫЙ КОНТЕЙНЕР */
         .container {
             max-width: 1200px;
             margin: 0 auto;
         }
-        /* Гласс-эффект для карточек */
-        .glass {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 24px;
-            padding: 24px;
-            transition: all 0.3s ease;
-        }
-        .glass:hover {
-            border-color: rgba(0, 240, 255, 0.3);
-            box-shadow: 0 0 40px rgba(0, 240, 255, 0.05);
-        }
-        /* Шапка */
+
+        /* ХЕДЕР */
         header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 20px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            margin-bottom: 50px;
             flex-wrap: wrap;
-            gap: 16px;
-        }
-        .logo {
-            font-family: 'Orbitron', monospace;
-            font-size: 28px;
-            font-weight: 900;
-            background: linear-gradient(135deg, #00F0FF, #FF007F);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            letter-spacing: 2px;
-        }
-        .logo span {
-            font-family: 'Inter', sans-serif;
-            font-weight: 400;
-            font-size: 14px;
-            -webkit-text-fill-color: #888;
-            margin-left: 8px;
-            letter-spacing: 0;
-        }
-        nav {
-            display: flex;
-            gap: 24px;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-        nav a {
-            color: #AAA;
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: 600;
-            transition: color 0.2s;
-            cursor: pointer;
-        }
-        nav a:hover {
-            color: #00F0FF;
-        }
-        .btn-primary {
-            background: linear-gradient(135deg, #00F0FF, #0088FF);
-            color: #0A0A0A;
-            font-weight: 700;
-            padding: 10px 24px;
-            border-radius: 40px;
-            border: none;
-            font-size: 14px;
-            cursor: pointer;
-            transition: all 0.2s;
-            text-decoration: none;
-            display: inline-block;
-        }
-        .btn-primary:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 30px rgba(0, 240, 255, 0.3);
-        }
-        .btn-secondary {
-            background: transparent;
-            color: #00F0FF;
-            border: 1px solid #00F0FF;
-            padding: 10px 24px;
-            border-radius: 40px;
-            font-weight: 700;
-            font-size: 14px;
-            cursor: pointer;
-            transition: all 0.2s;
-            text-decoration: none;
-            display: inline-block;
-        }
-        .btn-secondary:hover {
-            background: rgba(0, 240, 255, 0.1);
-            box-shadow: 0 0 20px rgba(0, 240, 255, 0.1);
-        }
-        /* Hero */
-        .hero {
-            padding: 80px 0 60px;
-            text-align: center;
-        }
-        .hero h1 {
-            font-family: 'Orbitron', monospace;
-            font-size: clamp(36px, 6vw, 72px);
-            font-weight: 900;
-            line-height: 1.1;
-            background: linear-gradient(135deg, #FFFFFF 20%, #00F0FF 60%, #FF007F 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 16px;
-        }
-        .hero p {
-            font-size: 18px;
-            color: #999;
-            max-width: 600px;
-            margin: 0 auto 32px;
-        }
-        .hero-buttons {
-            display: flex;
-            gap: 16px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-        /* Таблица */
-        .catalog {
-            padding: 40px 0;
-        }
-        .catalog h2 {
-            font-family: 'Orbitron', monospace;
-            font-size: 32px;
-            margin-bottom: 8px;
-        }
-        .catalog .sub {
-            color: #666;
-            margin-bottom: 24px;
-        }
-        .table-wrap {
-            overflow-x: auto;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 14px;
-        }
-        table th {
-            text-align: left;
-            padding: 16px 12px;
-            color: #888;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        }
-        table td {
-            padding: 14px 12px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
-        }
-        table tr:hover td {
-            background: rgba(0, 240, 255, 0.03);
-        }
-        .badge {
-            display: inline-block;
-            padding: 2px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-        .badge-account {
-            background: rgba(0, 240, 255, 0.15);
-            color: #00F0FF;
-        }
-        .badge-star {
-            background: rgba(255, 0, 127, 0.15);
-            color: #FF007F;
-        }
-        .btn-buy {
-            background: linear-gradient(135deg, #00F0FF, #0088FF);
-            color: #0A0A0A;
-            border: none;
-            padding: 6px 18px;
-            border-radius: 30px;
-            font-weight: 700;
-            font-size: 13px;
-            cursor: pointer;
-            transition: all 0.2s;
-            text-decoration: none;
-            display: inline-block;
-        }
-        .btn-buy:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 20px rgba(0, 240, 255, 0.3);
-        }
-        /* О нас */
-        .about {
-            padding: 60px 0;
-        }
-        .about-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 40px;
-        }
-        .about-item h3 {
-            color: #00F0FF;
-            font-size: 14px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 4px;
-        }
-        .about-item p {
-            font-size: 20px;
-            font-weight: 700;
-            color: #FFF;
-        }
-        .about-item .inn {
-            font-family: 'Orbitron', monospace;
-            color: #FF007F;
-            font-size: 22px;
-        }
-        /* Отзывы */
-        .reviews {
-            padding: 40px 0;
-        }
-        .review-cards {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
             gap: 20px;
         }
-        .review-card {
-            background: rgba(255, 255, 255, 0.03);
-            padding: 20px;
-            border-radius: 16px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
-        .review-card .text {
-            color: #CCC;
+        .tg-links {
+            display: flex;
+            gap: 20px;
             font-size: 14px;
-            font-style: italic;
+            color: #a0b3d9;
         }
-        .review-card .author {
-            margin-top: 12px;
-            color: #00F0FF;
+        .tg-links a {
+            transition: color 0.3s;
+        }
+        .tg-links a:hover {
+            color: #fff;
+        }
+
+        /* ОПИСАНИЕ */
+        .hero-title {
+            font-size: 42px;
+            font-weight: 800;
+            margin-bottom: 15px;
+            line-height: 1.1;
+        }
+        .hero-title span {
+            background: linear-gradient(135deg, #f7971e, #ffd200);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .hero-desc {
+            color: #8899bb;
+            font-size: 18px;
+            margin-bottom: 50px;
+            max-width: 600px;
+        }
+
+        /* ТОВАРЫ */
+        .section-title {
+            font-size: 24px;
             font-weight: 600;
-            font-size: 13px;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
-        /* Контакты */
-        .contacts {
-            padding: 60px 0;
+        .section-title .badge {
+            font-size: 12px;
+            background: rgba(255,255,255,0.08);
+            padding: 4px 12px;
+            border-radius: 50px;
+            color: #a0b3d9;
         }
-        .contacts-grid {
+
+        .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 24px;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 20px;
+            margin-bottom: 60px;
         }
-        .contacts-grid a {
-            color: #00F0FF;
-            text-decoration: none;
+
+        /* СТЕКЛЯННАЯ КАРТОЧКА (Glassmorphism) */
+        .card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 16px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(0, 229, 255, 0.3);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+        }
+        
+        /* Неоновая подсветка на карточках Звезд */
+        .card.type-stars {
+            border-color: rgba(255, 184, 0, 0.2);
+            background: rgba(255, 184, 0, 0.03);
+        }
+        .card.type-stars:hover {
+            border-color: #ffb800;
+            box-shadow: 0 0 20px rgba(255, 184, 0, 0.15);
+        }
+
+        .card .name {
+            font-size: 18px;
             font-weight: 600;
-            transition: color 0.2s;
+            margin-bottom: 8px;
+            color: #fff;
         }
-        .contacts-grid a:hover {
-            color: #FF007F;
+        .card .desc {
+            font-size: 14px;
+            color: #788baa;
+            margin-bottom: 20px;
         }
-        .contacts-grid .label {
-            color: #666;
-            font-size: 13px;
-            display: block;
-            margin-bottom: 2px;
+        .card .bottom-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: auto;
         }
-        /* Футер */
+        .card .price {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 22px;
+            font-weight: 600;
+            color: #00e5ff;
+        }
+        .card.type-stars .price {
+            color: #ffb800;
+        }
+        
+        .btn-buy {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #fff;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255,255,255,0.1);
+            cursor: pointer;
+        }
+        .btn-buy:hover {
+            background: #00e5ff;
+            color: #000;
+            border-color: #00e5ff;
+        }
+        .card.type-stars .btn-buy:hover {
+            background: #ffb800;
+            color: #000;
+            border-color: #ffb800;
+        }
+
+        /* ФУТЕР */
         footer {
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
-            padding: 30px 0;
-            text-align: center;
-            font-size: 13px;
-            color: #444;
+            margin-top: 80px;
+            padding: 40px 0;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 30px;
+            font-size: 14px;
+            color: #788baa;
         }
-        /* Адаптив */
+        footer .info-block {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        footer .info-block strong {
+            color: #c0d0ec;
+        }
+        .otzov-link {
+            color: #00e5ff;
+            text-decoration: underline;
+            text-underline-offset: 3px;
+        }
+        .otzov-link:hover {
+            color: #fff;
+        }
+
+        /* МОБИЛЬНАЯ АДАПТАЦИЯ */
         @media (max-width: 768px) {
-            .about-grid {
-                grid-template-columns: 1fr;
-                gap: 24px;
-            }
-            header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            nav {
-                width: 100%;
-                justify-content: space-between;
-            }
-            .hero h1 {
-                font-size: 32px;
-            }
-            .contacts-grid {
-                grid-template-columns: 1fr 1fr;
-            }
+            .hero-title { font-size: 32px; }
+            header { flex-direction: column; align-items: flex-start; }
+            .grid { grid-template-columns: 1fr 1fr; }
         }
         @media (max-width: 480px) {
-            nav a {
-                font-size: 12px;
-            }
-            .btn-primary,
-            .btn-secondary {
-                font-size: 12px;
-                padding: 8px 16px;
-            }
-            .contacts-grid {
-                grid-template-columns: 1fr;
-            }
-            table {
-                font-size: 12px;
-            }
-            table th,
-            table td {
-                padding: 10px 6px;
-            }
+            .grid { grid-template-columns: 1fr; }
+            .hero-title { font-size: 26px; }
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
+<div class="container">
+    
+    <!-- Шапка -->
+    <header>
+        <div class="logo">MaxMagaz</div>
+        <div class="tg-links">
+            <a href="https://t.me/max4n" target="_blank">Поддержка</a>
+            <a href="https://t.me/maxmagazbot" target="_blank">Магазин-бот</a>
+            <a href="https://t.me/maxmagaz_otzov" target="_blank" style="color: #00e5ff;">Отзывы</a>
+        </div>
+    </header>
 
-        <!-- ===== HEADER ===== -->
-        <header>
-            <div class="logo">
-                MAXMAGAZ
-                <span>© 2026</span>
-            </div>
-            <nav>
-                <a href="#catalog">Товары</a>
-                <a href="#about">О нас</a>
-                <a href="#reviews">Отзывы</a>
-                <a href="#contacts">Контакты</a>
-                <a href="https://t.me/maxmagazbot" target="_blank" class="btn-primary">Купить</a>
-            </nav>
-        </header>
-
-        <!-- ===== HERO ===== -->
-        <section class="hero">
-            <h1>Telegram<br/>Аккаунты &amp; Stars</h1>
-            <p>Моментальная выдача. Только проверенные номера. Работаем с 2024 года.</p>
-            <div class="hero-buttons">
-                <a href="#catalog" class="btn-primary">Смотреть каталог</a>
-                <a href="https://t.me/maxmagazbot" target="_blank" class="btn-secondary">Написать в бот</a>
-            </div>
-        </section>
-
-        <!-- ===== CATALOG ===== -->
-        <section class="catalog" id="catalog">
-            <h2>Каталог</h2>
-            <p class="sub">Цены в рублях. Выдача автоматическая через бота.</p>
-            <div class="glass">
-                <div class="table-wrap">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Товар</th>
-                                <th>Цена (₽)</th>
-                                <th>Тип</th>
-                                <th style="text-align:right;">Действие</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <!-- Аккаунты -->
-                            <tr><td>США +1</td><td>50</td><td><span class="badge badge-account">аккаунт</span></td><td style="text-align:right;"><a href="https://t.me/maxmagazbot?start=usa_50" target="_blank" class="btn-buy">Купить</a></td></tr>
-                            <tr><td>Канада +1</td><td>67</td><td><span class="badge badge-account">аккаунт</span></td><td style="text-align:right;"><a href="https://t.me/maxmagazbot?start=canada_67" target="_blank" class="btn-buy">Купить</a></td></tr>
-                            <tr><td>Бангладеш +880</td><td>60</td><td><span class="badge badge-account">аккаунт</span></td><td style="text-align:right;"><a href="https://t.me/maxmagazbot?start=bangladesh_60" target="_blank" class="btn-buy">Купить</a></td></tr>
-                            <tr><td>Эквадор +593</td><td>87</td><td><span class="badge badge-account">аккаунт</span></td><td style="text-align:right;"><a href="https://t.me/maxmagazbot?start=ecuador_87" target="_blank" class="btn-buy">Купить</a></td></tr>
-                            <tr><td>Узбекистан +998</td><td>100</td><td><span class="badge badge-account">аккаунт</span></td><td style="text-align:right;"><a href="https://t.me/maxmagazbot?start=uzbekistan_100" target="_blank" class="btn-buy">Купить</a></td></tr>
-                            <tr><td>Великобритания +44</td><td>160</td><td><span class="badge badge-account">аккаунт</span></td><td style="text-align:right;"><a href="https://t.me/maxmagazbot?start=uk_160" target="_blank" class="btn-buy">Купить</a></td></tr>
-                            <tr><td>Мексика +52</td><td>170</td><td><span class="badge badge-account">аккаунт</span></td><td style="text-align:right;"><a href="https://t.me/maxmagazbot?start=mexico_170" target="_blank" class="btn-buy">Купить</a></td></tr>
-                            <tr><td>Иран +98</td><td>170</td><td><span class="badge badge-account">аккаунт</span></td><td style="text-align:right;"><a href="https://t.me/maxmagazbot?start=iran_170" target="_blank" class="btn-buy">Купить</a></td></tr>
-                            <tr><td>Германия +49</td><td>180</td><td><span class="badge badge-account">аккаунт</span></td><td style="text-align:right;"><a href="https://t.me/maxmagazbot?start=germany_180" target="_blank" class="btn-buy">Купить</a></td></tr>
-                            <tr><td>Франция +33</td><td>200</td><td><span class="badge badge-account">аккаунт</span></td><td style="text-align:right;"><a href="https://t.me/maxmagazbot?start=france_200" target="_blank" class="btn-buy">Купить</a></td></tr>
-                            <tr><td>Казахстан +77</td><td>200</td><td><span class="badge badge-account">аккаунт</span></td><td style="text-align:right;"><a href="https://t.me/maxmagazbot?start=kazakhstan_200" target="_blank" class="btn-buy">Купить</a></td></tr>
-                            <tr><td>Нидерланды +31</td><td>230</td><td><span class="badge badge-account">аккаунт</span></td><td style="text-align:right;"><a href="https://t.me/maxmagazbot?start=netherlands_230" target="_blank" class="btn-buy">Купить</a></td></tr>
-                            <tr><td>Япония +81</td><td>250</td><td><span class="badge badge-account">аккаунт</span></td><td style="text-align:right;"><a href="https://t.me/maxmagazbot?start=japan_250" target="_blank" class="btn-buy">Купить</a></td></tr>
-                            <!-- Stars -->
-                            <tr><td>⭐ Звезды</td><td>1.35</td><td><span class="badge badge-star">звезда</span></td><td style="text-align:right;"><a href="https://t.me/maxmagazbot?start=stars_1.35" target="_blank" class="btn-buy">Купить</a></td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
-
-        <!-- ===== ABOUT ===== -->
-        <section class="about" id="about">
-            <div class="glass">
-                <div class="about-grid">
-                    <div>
-                        <div class="about-item">
-                            <h3>Владелец</h3>
-                            <p>Бузмаков Максим Витальевич</p>
-                        </div>
-                        <div class="about-item" style="margin-top:20px;">
-                            <h3>ИНН</h3>
-                            <p class="inn">422312373598</p>
-                        </div>
-                    </div>
-                    <div>
-                        <div class="about-item">
-                            <h3>О нас</h3>
-                            <p style="font-weight:400;font-size:16px;color:#AAA;">MaxMagaz — надёжный поставщик Telegram-аккаунтов и Stars. Все номера проходят проверку. Работаем с 2024 года. Моментальная автоматическая выдача через бота.</p>
-                        </div>
-                        <div class="about-item" style="margin-top:20px;">
-                            <h3>Гарантии</h3>
-                            <p style="font-weight:400;font-size:16px;color:#AAA;">Замена при невалидном коде. Поддержка 24/7 в боте.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- ===== REVIEWS ===== -->
-        <section class="reviews" id="reviews">
-            <h2 style="font-family:'Orbitron',monospace;font-size:28px;margin-bottom:20px;">Отзывы</h2>
-            <div class="review-cards">
-                <div class="review-card"><div class="text">"Быстро, дёшево, сердито. Взял 3 аккаунта — всё зашло."</div><div class="author">— Артём</div></div>
-                <div class="review-card"><div class="text">"Stars пришли через минуту после оплаты. Рекомендую!"</div><div class="author">— Екатерина</div></div>
-                <div class="review-card"><div class="text">"Нормальный магазин, бот умный. Взял США — код пришёл."</div><div class="author">— Дмитрий</div></div>
-            </div>
-            <div style="text-align:center;margin-top:20px;">
-                <a href="https://t.me/maxmagaz_otzov" target="_blank" style="color:#00F0FF;text-decoration:none;font-weight:600;">Читать все отзывы в Telegram →</a>
-            </div>
-        </section>
-
-        <!-- ===== CONTACTS ===== -->
-        <section class="contacts" id="contacts">
-            <div class="glass">
-                <div class="contacts-grid">
-                    <div>
-                        <span class="label">Telegram</span>
-                        <a href="https://t.me/max4n" target="_blank">@max4n</a>
-                    </div>
-                    <div>
-                        <span class="label">Бот для покупок</span>
-                        <a href="https://t.me/maxmagazbot" target="_blank">@maxmagazbot</a>
-                    </div>
-                    <div>
-                        <span class="label">Отзывы</span>
-                        <a href="https://t.me/maxmagaz_otzov" target="_blank">@maxmagaz_otzov</a>
-                    </div>
-                    <div>
-                        <span class="label">ИНН</span>
-                        <span style="color:#FFF;font-weight:600;font-family:'Orbitron',monospace;">422312373598</span>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- ===== FOOTER ===== -->
-        <footer>
-            <p>© 2026 MaxMagaz. ИП Бузмаков Максим Витальевич. ИНН 422312373598</p>
-            <p style="margin-top:8px;font-size:12px;color:#333;">Сайт создан для автоматической продажи Telegram-аккаунтов и Stars.</p>
-        </footer>
-
+    <!-- Заголовок -->
+    <div class="hero-title">
+        Аккаунты и <span>Звёзды</span><br>
+        для Telegram
     </div>
+    <div class="hero-desc">
+        Мгновенная выдача. Работаем официально. Оплата через бота.
+    </div>
+
+    <!-- Секция: Аккаунты -->
+    <div class="section-title">
+        📱 Аккаунты <span class="badge">мгновенная выдача</span>
+    </div>
+    <div class="grid">
+        <!-- Карточки аккаунтов (Ссылка ведет в бота с пометкой товара) -->
+        <div class="card">
+            <div>
+                <div class="name">США +1</div>
+                <div class="desc">Американский номер, верификация</div>
+            </div>
+            <div class="bottom-row">
+                <span class="price">50 ₽</span>
+                <a href="https://t.me/maxmagazbot?start=usa" target="_blank" class="btn-buy">Купить</a>
+            </div>
+        </div>
+
+        <div class="card">
+            <div>
+                <div class="name">Канада +1</div>
+                <div class="desc">Канадский номер</div>
+            </div>
+            <div class="bottom-row">
+                <span class="price">67 ₽</span>
+                <a href="https://t.me/maxmagazbot?start=canada" target="_blank" class="btn-buy">Купить</a>
+            </div>
+        </div>
+
+        <div class="card">
+            <div>
+                <div class="name">Бангладеш +880</div>
+                <div class="desc">Бангладешский номер</div>
+            </div>
+            <div class="bottom-row">
+                <span class="price">60 ₽</span>
+                <a href="https://t.me/maxmagazbot?start=bangladesh" target="_blank" class="btn-buy">Купить</a>
+            </div>
+        </div>
+
+        <div class="card">
+            <div>
+                <div class="name">Эквадор +593</div>
+                <div class="desc">Эквадорский номер</div>
+            </div>
+            <div class="bottom-row">
+                <span class="price">87 ₽</span>
+                <a href="https://t.me/maxmagazbot?start=ecuador" target="_blank" class="btn-buy">Купить</a>
+            </div>
+        </div>
+
+        <div class="card">
+            <div>
+                <div class="name">Узбекистан +998</div>
+                <div class="desc">Узбекский номер</div>
+            </div>
+            <div class="bottom-row">
+                <span class="price">100 ₽</span>
+                <a href="https://t.me/maxmagazbot?start=uzbekistan" target="_blank" class="btn-buy">Купить</a>
+            </div>
+        </div>
+
+        <div class="card">
+            <div>
+                <div class="name">Великобритания +44</div>
+                <div class="desc">Британский номер</div>
+            </div>
+            <div class="bottom-row">
+                <span class="price">160 ₽</span>
+                <a href="https://t.me/maxmagazbot?start=uk" target="_blank" class="btn-buy">Купить</a>
+            </div>
+        </div>
+
+        <div class="card">
+            <div>
+                <div class="name">Мексика +52</div>
+                <div class="desc">Мексиканский номер</div>
+            </div>
+            <div class="bottom-row">
+                <span class="price">170 ₽</span>
+                <a href="https://t.me/maxmagazbot?start=mexico" target="_blank" class="btn-buy">Купить</a>
+            </div>
+        </div>
+
+        <div class="card">
+            <div>
+                <div class="name">Иран +98</div>
+                <div class="desc">Иранский номер</div>
+            </div>
+            <div class="bottom-row">
+                <span class="price">170 ₽</span>
+                <a href="https://t.me/maxmagazbot?start=iran" target="_blank" class="btn-buy">Купить</a>
+            </div>
+        </div>
+
+        <div class="card">
+            <div>
+                <div class="name">Германия +49</div>
+                <div class="desc">Немецкий номер</div>
+            </div>
+            <div class="bottom-row">
+                <span class="price">180 ₽</span>
+                <a href="https://t.me/maxmagazbot?start=germany" target="_blank" class="btn-buy">Купить</a>
+            </div>
+        </div>
+
+        <div class="card">
+            <div>
+                <div class="name">Франция +33</div>
+                <div class="desc">Французский номер</div>
+            </div>
+            <div class="bottom-row">
+                <span class="price">200 ₽</span>
+                <a href="https://t.me/maxmagazbot?start=france" target="_blank" class="btn-buy">Купить</a>
+            </div>
+        </div>
+
+        <div class="card">
+            <div>
+                <div class="name">Казахстан +77</div>
+                <div class="desc">Казахстанский номер</div>
+            </div>
+            <div class="bottom-row">
+                <span class="price">200 ₽</span>
+                <a href="https://t.me/maxmagazbot?start=kazakhstan" target="_blank" class="btn-buy">Купить</a>
+            </div>
+        </div>
+
+        <div class="card">
+            <div>
+                <div class="name">Нидерланды +31</div>
+                <div class="desc">Голландский номер</div>
+            </div>
+            <div class="bottom-row">
+                <span class="price">230 ₽</span>
+                <a href="https://t.me/maxmagazbot?start=netherlands" target="_blank" class="btn-buy">Купить</a>
+            </div>
+        </div>
+
+        <div class="card">
+            <div>
+                <div class="name">Япония +81</div>
+                <div class="desc">Японский номер</div>
+            </div>
+            <div class="bottom-row">
+                <span class="price">250 ₽</span>
+                <a href="https://t.me/maxmagazbot?start=japan" target="_blank" class="btn-buy">Купить</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Секция: Звезды -->
+    <div class="section-title" style="color: #ffb800;">
+        ⭐ Telegram Stars <span class="badge">1 Star = 1.35 ₽</span>
+    </div>
+    <div class="grid">
+        <!-- Пакеты звезд (тип карточки изменен для золотого неона) -->
+        <div class="card type-stars">
+            <div>
+                <div class="name" style="color:#ffb800;">100 Stars</div>
+                <div class="desc">Для поддержки авторов и ботов</div>
+            </div>
+            <div class="bottom-row">
+                <span class="price">135 ₽</span>
+                <a href="https://t.me/maxmagazbot?start=stars_100" target="_blank" class="btn-buy">Купить</a>
+            </div>
+        </div>
+
+        <div class="card type-stars">
+            <div>
+                <div class="name" style="color:#ffb800;">300 Stars</div>
+                <div class="desc">Популярный пакет</div>
+            </div>
+            <div class="bottom-row">
+                <span class="price">405 ₽</span>
+                <a href="https://t.me/maxmagazbot?start=stars_300" target="_blank" class="btn-buy">Купить</a>
+            </div>
+        </div>
+
+        <div class="card type-stars">
+            <div>
+                <div class="name" style="color:#ffb800;">500 Stars</div>
+                <div class="desc">Выгодный пакет</div>
+            </div>
+            <div class="bottom-row">
+                <span class="price">675 ₽</span>
+                <a href="https://t.me/maxmagazbot?start=stars_500" target="_blank" class="btn-buy">Купить</a>
+            </div>
+        </div>
+
+        <div class="card type-stars">
+            <div>
+                <div class="name" style="color:#ffb800;">1000 Stars</div>
+                <div class="desc">Максимальный пакет</div>
+            </div>
+            <div class="bottom-row">
+                <span class="price">1 350 ₽</span>
+                <a href="https://t.me/maxmagazbot?start=stars_1000" target="_blank" class="btn-buy">Купить</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- ФУТЕР -->
+    <footer>
+        <div class="info-block">
+            <strong>MaxMagaz</strong>
+            <span>Магазин Telegram аккаунтов и Stars</span>
+            <a href="https://t.me/maxmagaz_otzov" class="otzov-link" target="_blank">Канал с отзывами @maxmagaz_otzov</a>
+        </div>
+        
+        <div class="info-block">
+            <strong>Реквизиты (ИП)</strong>
+            <span>Бузмаков Максим Витальевич</span>
+            <span>ИНН: 422312373598</span>
+        </div>
+
+        <div class="info-block">
+            <strong>Контакты</strong>
+            <span>Поддержка: <a href="https://t.me/max4n" target="_blank" style="color:#00e5ff;">@max4n</a></span>
+            <span>Бот для покупок: <a href="https://t.me/maxmagazbot" target="_blank" style="color:#00e5ff;">@maxmagazbot</a></span>
+        </div>
+    </footer>
+
+</div>
 
 </body>
 </html>
