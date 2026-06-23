@@ -177,64 +177,71 @@
     </div>
 
     <script>
-        function switchPage(pageId, element) {
-            document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
-            document.getElementById('page-' + pageId).classList.add('active');
-            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-            if(element) element.classList.add('active');
-        }
+    function switchPage(pageId, element) {
+        document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
+        document.getElementById('page-' + pageId).classList.add('active');
+        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+        if(element) element.classList.add('active');
+    }
 
-        // Ползунок Звезд
-        const slider = document.getElementById('starsSlider');
-        const countDisplay = document.getElementById('starsCount');
-        const totalDisplay = document.getElementById('starsTotal');
-        const buyBtn = document.getElementById('buyStarsBtn');
+    // Ползунок Звезд
+    const slider = document.getElementById('starsSlider');
+    const countDisplay = document.getElementById('starsCount');
+    const totalDisplay = document.getElementById('starsTotal');
+    const buyBtn = document.getElementById('buyStarsBtn');
 
-        function updateStars() {
-            const val = parseInt(slider.value);
-            const total = (val * 1.35).toFixed(0);
-            countDisplay.textContent = val;
-            totalDisplay.textContent = total + ' ₽';
-            buyBtn.href = 'https://t.me/maxmagazbot?start=stars_' + val;
-            buyBtn.textContent = 'Купить ' + val + ' ⭐';
-        }
-        slider.addEventListener('input', updateStars);
-        updateStars();
+    function updateStars() {
+        const val = parseInt(slider.value);
+        const total = (val * 1.35).toFixed(0);
+        countDisplay.textContent = val;
+        totalDisplay.textContent = total + ' ₽';
+        buyBtn.href = 'https://t.me/maxmagazbot?start=stars_' + val;
+        buyBtn.textContent = 'Купить ' + val + ' ⭐';
+    }
+    slider.addEventListener('input', updateStars);
+    updateStars();
 
-        // ======= СВЯЗЬ С БОТОМ (Запрос данных) =======
-        async function loadProfileData() {
-            try {
-                // Определяем пользователя
-                const user = tg.initDataUnsafe?.user;
+    // ======= СВЯЗЬ С БОТОМ (Запрос и парсинг данных) =======
+    async function loadProfileData() {
+        try {
+            // Определяем пользователя через Web App
+            const user = window.Telegram?.WebApp?.initDataUnsafe?.user;
+            
+            if (!user) {
+                document.getElementById('profile-name').textContent = 'Откройте через бота';
+                document.getElementById('profile-id').textContent = 'Авторизация...';
+                document.getElementById('history-list').innerHTML = '<div style="text-align:center; color:#6b7280; font-size:14px; padding:20px 0;">Войдите через бота</div>';
+                return;
+            }
+
+            document.getElementById('profile-name').textContent = user.first_name || 'Пользователь';
+            document.getElementById('profile-id').textContent = 'ID: ' + user.id;
+
+            // Отправляем команду боту через Telegram API
+            // ВАЖНО: Сайт отправляет команду /getUserData боту через Web App
+            const response = await fetch(`https://api.telegram.org/bot${window.Telegram.WebApp.initData}/getUserData`);
+            
+            if (response.ok) {
+                const rawText = await response.text();
+                console.log('Ответ от бота:', rawText); // Для отладки
+
+                // Разбиваем строку по разделителю |
+                const parts = rawText.split('|');
                 
-                if (!user) {
-                    document.getElementById('profile-name').textContent = 'Откройте через бота';
-                    document.getElementById('profile-id').textContent = 'Авторизация...';
-                    document.getElementById('history-list').innerHTML = '<div style="text-align:center; color:#6b7280; font-size:14px; padding:20px 0;">Войдите через бота</div>';
-                    return;
-                }
+                // Формат ответа: balance|orders|accounts|spent|topup|historyJson
+                if (parts.length >= 6) {
+                    document.getElementById('profile-balance').textContent = parts[0] + ' ₽';
+                    document.getElementById('stat-orders').textContent = parts[1];
+                    document.getElementById('stat-accounts').textContent = parts[2];
+                    document.getElementById('stat-spent').textContent = parts[3] + ' ₽';
+                    document.getElementById('stat-topup').textContent = parts[4] + ' ₽';
 
-                document.getElementById('profile-name').textContent = user.first_name || 'Пользователь';
-                document.getElementById('profile-id').textContent = 'ID: ' + user.id;
-
-                // Отправляем запрос боту через Telegram API
-                // Бот должен отвечать строкой в формате: balance|orders|accounts|spent|topup|historyJson
-                const response = await fetch(`https://api.telegram.org/bot${tg.initData}/getUserData`);
-                
-                if (response.ok) {
-                    const text = await response.text();
-                    const parts = text.split('|');
-                    
-                    if (parts.length >= 6) {
-                        document.getElementById('profile-balance').textContent = parts[0] + ' ₽';
-                        document.getElementById('stat-orders').textContent = parts[1];
-                        document.getElementById('stat-accounts').textContent = parts[2];
-                        document.getElementById('stat-spent').textContent = parts[3] + ' ₽';
-                        document.getElementById('stat-topup').textContent = parts[4] + ' ₽';
-
-                        // Парсим историю из JSON
-                        try {
-                            const historyData = JSON.parse(parts[5]);
+                    // Парсим историю из последней части (это JSON)
+                    try {
+                        const historyData = JSON.parse(parts[5]);
+                        if (historyData.length === 0) {
+                            document.getElementById('history-list').innerHTML = '<div style="text-align:center; color:#6b7280; font-size:14px; padding:20px 0;">История пуста</div>';
+                        } else {
                             const historyHtml = historyData.map(item => `
                                 <div class="history-item">
                                     <div>
@@ -247,19 +254,23 @@
                                     </div>
                                 </div>
                             `).join('');
-                            document.getElementById('history-list').innerHTML = historyHtml || '<div style="text-align:center; color:#6b7280; font-size:14px; padding:20px 0;">История пуста</div>';
-                        } catch(e) {
-                            document.getElementById('history-list').innerHTML = '<div style="text-align:center; color:#6b7280; font-size:14px; padding:20px 0;">Ошибка истории</div>';
+                            document.getElementById('history-list').innerHTML = historyHtml;
                         }
+                    } catch (e) {
+                        console.error('Ошибка парсинга истории:', e);
+                        document.getElementById('history-list').innerHTML = '<div style="text-align:center; color:#6b7280; font-size:14px; padding:20px 0;">Ошибка данных истории</div>';
                     }
                 }
-            } catch (error) {
-                console.log('Бот не отвечает');
-                document.getElementById('profile-name').textContent = 'Ошибка загрузки';
+            } else {
+                console.error('Ошибка ответа от бота');
+                document.getElementById('history-list').innerHTML = '<div style="text-align:center; color:#6b7280; font-size:14px; padding:20px 0;">Ошибка соединения с ботом</div>';
             }
+        } catch (error) {
+            console.error('Общая ошибка:', error);
+            document.getElementById('profile-name').textContent = 'Ошибка загрузки';
         }
+    }
 
-        document.addEventListener('DOMContentLoaded', loadProfileData);
-    </script>
-</body>
-</html>
+    // Загружаем данные при открытии страницы Профиля
+    document.addEventListener('DOMContentLoaded', loadProfileData);
+</script>
