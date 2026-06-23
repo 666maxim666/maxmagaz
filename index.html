@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <!-- Эти 2 строчки для Telegram Web App -->
+    <!-- Telegram WebApp -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script> const tg = window.Telegram.WebApp; </script>
 
@@ -47,7 +47,6 @@
         .news-item h3 { font-size: 18px; margin-bottom: 8px; }
         .news-item p { font-size: 14px; color: #9ca3af; line-height: 1.5; }
 
-        /* ПРОФИЛЬ И СТАТИСТИКА */
         .profile-header { background: #141414; border-radius: 20px; padding: 25px; text-align: center; border: 1px solid #222; margin-bottom: 20px; }
         .avatar { width: 70px; height: 70px; border-radius: 50%; background: linear-gradient(135deg, #d946ef, #a855f7); margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; font-size: 28px; }
         .profile-name { font-size: 20px; font-weight: 700; }
@@ -60,7 +59,6 @@
         .stat-card .val { font-size: 18px; font-weight: 700; margin-top: 4px; color: #d946ef; }
         .stat-card .lbl { font-size: 11px; color: #6b7280; }
 
-        /* Блок истории покупок */
         .history-list { display: flex; flex-direction: column; gap: 10px; }
         .history-item { background: #141414; border-radius: 12px; padding: 14px; border: 1px solid #222; display: flex; justify-content: space-between; align-items: center; }
         .history-item .country { font-weight: 600; font-size: 14px; }
@@ -80,7 +78,7 @@
 </head>
 <body>
 
-    <!-- ================= КАТАЛОГ (ГЛАВНАЯ) ================= -->
+    <!-- ================= КАТАЛОГ ================= -->
     <div id="page-catalog" class="page active">
         <div class="header">
             <div class="logo">MaxMagaz</div>
@@ -116,7 +114,7 @@
         </div>
     </div>
 
-    <!-- ================= СТРАНИЦА: НОВОСТИ ================= -->
+    <!-- ================= НОВОСТИ ================= -->
     <div id="page-news" class="page">
         <div class="header"><div class="logo">📰 Новости</div></div>
         <div class="news-container">
@@ -133,7 +131,7 @@
         </div>
     </div>
 
-    <!-- ================= СТРАНИЦА: ПРОФИЛЬ ================= -->
+    <!-- ================= ПРОФИЛЬ ================= -->
     <div id="page-profile" class="page">
         <div class="header"><div class="logo">👤 Профиль</div></div>
         
@@ -162,124 +160,146 @@
 
     <!-- ================= НИЖНЯЯ ПАНЕЛЬ ================= -->
     <div class="bottom-nav">
-        <div class="nav-item active" onclick="switchPage('catalog', this)">
-            <div class="icon">📱</div><div>Каталог</div>
-        </div>
-        <div class="nav-item" onclick="switchPage('news', this)">
-            <div class="icon">📰</div><div>Новости</div>
-        </div>
-        <div class="nav-item" onclick="switchPage('profile', this)">
-            <div class="icon">👤</div><div>Профиль</div>
-        </div>
-        <div class="nav-item" onclick="window.open('https://t.me/maxmagazbot', '_blank')">
-            <div class="icon">💳</div><div>Оплата</div>
-        </div>
+        <div class="nav-item" data-page="catalog"><span class="icon">📱</span>Каталог</div>
+        <div class="nav-item" data-page="news"><span class="icon">📰</span>Новости</div>
+        <div class="nav-item" data-page="profile"><span class="icon">👤</span>Профиль</div>
+        <div class="nav-item" data-page="pay"><span class="icon">💳</span>Оплата</div>
     </div>
 
     <script>
-    // Прямая ссылка на опубликованную таблицу
-    const PUBLISHED_SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSs_-DOjtnWuxZ-76wHAk1_ZjPubceaCPB_BlzDOUljY59oK16Oscv9FdCk25FdjDrTtNuUKUmeuPVL/pubhtml';
+        // Переключение вкладок через addEventListener
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const pageId = this.dataset.page;
+                
+                // Скрываем все страницы
+                document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
+                
+                // Показываем нужную
+                const targetPage = document.getElementById('page-' + pageId);
+                if (targetPage) {
+                    targetPage.classList.add('active');
+                }
+                
+                // Обновляем активную кнопку
+                document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+                this.classList.add('active');
 
-    // Функция переключения вкладок
-    function switchPage(pageId, element) {
-        document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
-        document.getElementById('page-' + pageId).classList.add('active');
-        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-        if(element) element.classList.add('active');
+                // Если выбрали оплату — открываем бота
+                if (pageId === 'pay') {
+                    window.open('https://t.me/maxmagazbot', '_blank');
+                }
 
-        // Если переключились на профиль — загружаем данные
-        if (pageId === 'profile') {
-            loadProfileData();
-        }
-    }
-
-    // Загрузка данных профиля из таблицы
-    async function loadProfileData() {
-        try {
-            const user = window.Telegram?.WebApp?.initDataUnsafe?.user;
-            if (!user) {
-                document.getElementById('profile-name').textContent = 'Откройте через бота';
-                document.getElementById('profile-id').textContent = 'Авторизация...';
-                document.getElementById('history-list').innerHTML = '<div style="text-align:center; color:#6b7280; font-size:14px; padding:20px 0;">Войдите через бота</div>';
-                return;
-            }
-
-            document.getElementById('profile-name').textContent = user.first_name || 'Пользователь';
-            document.getElementById('profile-id').textContent = 'ID: ' + user.id;
-
-            // Получаем данные из таблицы
-            const url = PUBLISHED_SHEET_URL.replace('/pubhtml', '/gviz/tq?tqx=out:json');
-            const response = await fetch(url);
-            const raw = await response.text();
-            const json = JSON.parse(raw.substring(47, raw.length - 2));
-
-            const rows = json.table.rows;
-            const headers = json.table.cols.map(col => col.label);
-
-            // Индексы колонок
-            const userIdIndex = headers.indexOf('User ID');
-            const itemIndex = headers.indexOf('Товар');
-            const priceIndex = headers.indexOf('Сумма');
-            const dateIndex = headers.indexOf('Время');
-
-            let totalSpent = 0;
-            let orderCount = 0;
-            const history = [];
-
-            rows.forEach(row => {
-                const rowData = row.c.map(cell => cell ? cell.v : '');
-                const userId = String(rowData[userIdIndex]).trim();
-                if (userId === String(user.id)) {
-                    orderCount++;
-                    const price = parseFloat(rowData[priceIndex]) || 0;
-                    totalSpent += price;
-                    history.push({
-                        country: rowData[itemIndex] || 'Неизвестно',
-                        date: rowData[dateIndex] || '',
-                        price: price,
-                        status: 'Выдан'
-                    });
+                // Если выбрали профиль — загружаем данные
+                if (pageId === 'profile') {
+                    loadProfileData();
                 }
             });
+        });
 
-            // Обновляем интерфейс
-            document.getElementById('profile-balance').textContent = '0 ₽';
-            document.getElementById('stat-orders').textContent = orderCount;
-            document.getElementById('stat-accounts').textContent = history.length;
-            document.getElementById('stat-spent').textContent = totalSpent + ' ₽';
-            document.getElementById('stat-topup').textContent = '0 ₽';
+        // Ползунок звёзд
+        const slider = document.getElementById('starsSlider');
+        const countDisplay = document.getElementById('starsCount');
+        const totalDisplay = document.getElementById('starsTotal');
+        const buyBtn = document.getElementById('buyStarsBtn');
 
-            if (history.length === 0) {
-                document.getElementById('history-list').innerHTML = '<div style="text-align:center; color:#6b7280; font-size:14px; padding:20px 0;">Нет покупок</div>';
-            } else {
-                const historyHtml = history.map(item => `
-                    <div class="history-item">
-                        <div>
-                            <div class="country">${item.country}</div>
-                            <div class="date">${item.date}</div>
+        function updateStars() {
+            const val = parseInt(slider.value);
+            const total = (val * 1.35).toFixed(0);
+            countDisplay.textContent = val;
+            totalDisplay.textContent = total + ' ₽';
+            buyBtn.href = 'https://t.me/maxmagazbot?start=stars_' + val;
+            buyBtn.textContent = 'Купить ' + val + ' ⭐';
+        }
+        slider.addEventListener('input', updateStars);
+        updateStars();
+
+        // Загрузка профиля
+        const PUBLISHED_SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSs_-DOjtnWuxZ-76wHAk1_ZjPubceaCPB_BlzDOUljY59oK16Oscv9FdCk25FdjDrTtNuUKUmeuPVL/pubhtml';
+
+        async function loadProfileData() {
+            try {
+                const user = window.Telegram?.WebApp?.initDataUnsafe?.user;
+                if (!user) {
+                    document.getElementById('profile-name').textContent = 'Откройте через бота';
+                    document.getElementById('profile-id').textContent = 'Авторизация...';
+                    document.getElementById('history-list').innerHTML = '<div style="text-align:center; color:#6b7280; font-size:14px; padding:20px 0;">Войдите через бота</div>';
+                    return;
+                }
+
+                document.getElementById('profile-name').textContent = user.first_name || 'Пользователь';
+                document.getElementById('profile-id').textContent = 'ID: ' + user.id;
+
+                const url = PUBLISHED_SHEET_URL.replace('/pubhtml', '/gviz/tq?tqx=out:json');
+                const response = await fetch(url);
+                const raw = await response.text();
+                const json = JSON.parse(raw.substring(47, raw.length - 2));
+
+                const rows = json.table.rows;
+                const headers = json.table.cols.map(col => col.label);
+
+                const userIdIndex = headers.indexOf('User ID');
+                const itemIndex = headers.indexOf('Товар');
+                const priceIndex = headers.indexOf('Сумма');
+                const dateIndex = headers.indexOf('Время');
+
+                let totalSpent = 0;
+                let orderCount = 0;
+                const history = [];
+
+                rows.forEach(row => {
+                    const rowData = row.c.map(cell => cell ? cell.v : '');
+                    const userId = String(rowData[userIdIndex]).trim();
+                    if (userId === String(user.id)) {
+                        orderCount++;
+                        const price = parseFloat(rowData[priceIndex]) || 0;
+                        totalSpent += price;
+                        history.push({
+                            country: rowData[itemIndex] || 'Неизвестно',
+                            date: rowData[dateIndex] || '',
+                            price: price,
+                            status: 'Выдан'
+                        });
+                    }
+                });
+
+                document.getElementById('profile-balance').textContent = '0 ₽';
+                document.getElementById('stat-orders').textContent = orderCount;
+                document.getElementById('stat-accounts').textContent = history.length;
+                document.getElementById('stat-spent').textContent = totalSpent + ' ₽';
+                document.getElementById('stat-topup').textContent = '0 ₽';
+
+                if (history.length === 0) {
+                    document.getElementById('history-list').innerHTML = '<div style="text-align:center; color:#6b7280; font-size:14px; padding:20px 0;">Нет покупок</div>';
+                } else {
+                    const historyHtml = history.map(item => `
+                        <div class="history-item">
+                            <div>
+                                <div class="country">${item.country}</div>
+                                <div class="date">${item.date}</div>
+                            </div>
+                            <div>
+                                <div class="hprice">${item.price} ₽</div>
+                                <div class="status status-issued">${item.status}</div>
+                            </div>
                         </div>
-                        <div>
-                            <div class="hprice">${item.price} ₽</div>
-                            <div class="status status-issued">${item.status}</div>
-                        </div>
-                    </div>
-                `).join('');
-                document.getElementById('history-list').innerHTML = historyHtml;
+                    `).join('');
+                    document.getElementById('history-list').innerHTML = historyHtml;
+                }
+
+            } catch (error) {
+                console.error('Ошибка:', error);
+                document.getElementById('profile-name').textContent = 'Ошибка загрузки';
+                document.getElementById('history-list').innerHTML = '<div style="text-align:center; color:#6b7280; font-size:14px; padding:20px 0;">Ошибка соединения с таблицей</div>';
             }
-
-        } catch (error) {
-            console.error('Ошибка:', error);
-            document.getElementById('profile-name').textContent = 'Ошибка загрузки';
-            document.getElementById('history-list').innerHTML = '<div style="text-align:center; color:#6b7280; font-size:14px; padding:20px 0;">Ошибка соединения с таблицей</div>';
         }
-    }
 
-    // Загружаем данные при открытии страницы
-    document.addEventListener('DOMContentLoaded', () => {
-        if (document.getElementById('page-profile').classList.contains('active')) {
-            loadProfileData();
-        }
-    });
+        // Загружаем профиль при открытии страницы
+        document.addEventListener('DOMContentLoaded', () => {
+            if (document.getElementById('page-profile').classList.contains('active')) {
+                loadProfileData();
+            }
+        });
     </script>
 </body>
 </html>
