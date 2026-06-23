@@ -177,36 +177,12 @@
     </div>
 
     <script>
-    function switchPage(pageId, element) {
-        document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
-        document.getElementById('page-' + pageId).classList.add('active');
-        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-        if(element) element.classList.add('active');
-    }
+    // Прямая ссылка на опубликованную таблицу
+    const PUBLISHED_SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSs_-DOjtnWuxZ-76wHAk1_ZjPubceaCPB_BlzDOUljY59oK16Oscv9FdCk25FdjDrTtNuUKUmeuPVL/pubhtml';
 
-    // Ползунок Звезд
-    const slider = document.getElementById('starsSlider');
-    const countDisplay = document.getElementById('starsCount');
-    const totalDisplay = document.getElementById('starsTotal');
-    const buyBtn = document.getElementById('buyStarsBtn');
-
-    function updateStars() {
-        const val = parseInt(slider.value);
-        const total = (val * 1.35).toFixed(0);
-        countDisplay.textContent = val;
-        totalDisplay.textContent = total + ' ₽';
-        buyBtn.href = 'https://t.me/maxmagazbot?start=stars_' + val;
-        buyBtn.textContent = 'Купить ' + val + ' ⭐';
-    }
-    slider.addEventListener('input', updateStars);
-    updateStars();
-
-    // ======= СВЯЗЬ С БОТОМ (Запрос и парсинг данных) =======
     async function loadProfileData() {
         try {
-            // Определяем пользователя через Web App
             const user = window.Telegram?.WebApp?.initDataUnsafe?.user;
-            
             if (!user) {
                 document.getElementById('profile-name').textContent = 'Откройте через бота';
                 document.getElementById('profile-id').textContent = 'Авторизация...';
@@ -217,57 +193,72 @@
             document.getElementById('profile-name').textContent = user.first_name || 'Пользователь';
             document.getElementById('profile-id').textContent = 'ID: ' + user.id;
 
-            // Отправляем команду боту через Telegram API
-            // ВАЖНО: Сайт отправляет команду /getUserData боту через Web App
-            const response = await fetch(`https://api.telegram.org/bot${window.Telegram.WebApp.initData}/getUserData`);
-            
-            if (response.ok) {
-                const rawText = await response.text();
-                console.log('Ответ от бота:', rawText); // Для отладки
+            // Читаем данные из опубликованной таблицы
+            const url = PUBLISHED_SHEET_URL.replace('/pubhtml', '/gviz/tq?tqx=out:json');
+            const response = await fetch(url);
+            const raw = await response.text();
+            const json = JSON.parse(raw.substring(47, raw.length - 2));
 
-                // Разбиваем строку по разделителю |
-                const parts = rawText.split('|');
-                
-                // Формат ответа: balance|orders|accounts|spent|topup|historyJson
-                if (parts.length >= 6) {
-                    document.getElementById('profile-balance').textContent = parts[0] + ' ₽';
-                    document.getElementById('stat-orders').textContent = parts[1];
-                    document.getElementById('stat-accounts').textContent = parts[2];
-                    document.getElementById('stat-spent').textContent = parts[3] + ' ₽';
-                    document.getElementById('stat-topup').textContent = parts[4] + ' ₽';
+            const rows = json.table.rows;
+            const headers = json.table.cols.map(col => col.label);
 
-                    // Парсим историю из последней части (это JSON)
-                    try {
-                        const historyData = JSON.parse(parts[5]);
-                        if (historyData.length === 0) {
-                            document.getElementById('history-list').innerHTML = '<div style="text-align:center; color:#6b7280; font-size:14px; padding:20px 0;">История пуста</div>';
-                        } else {
-                            const historyHtml = historyData.map(item => `
-                                <div class="history-item">
-                                    <div>
-                                        <div class="country">${item.country}</div>
-                                        <div class="date">${item.date}</div>
-                                    </div>
-                                    <div>
-                                        <div class="hprice">${item.price} ₽</div>
-                                        <div class="status ${item.status === 'Выдан' ? 'status-issued' : 'status-pending'}">${item.status}</div>
-                                    </div>
-                                </div>
-                            `).join('');
-                            document.getElementById('history-list').innerHTML = historyHtml;
-                        }
-                    } catch (e) {
-                        console.error('Ошибка парсинга истории:', e);
-                        document.getElementById('history-list').innerHTML = '<div style="text-align:center; color:#6b7280; font-size:14px; padding:20px 0;">Ошибка данных истории</div>';
-                    }
+            // Определяем индексы колонок (по названиям в твоей таблице)
+            const userIdIndex = headers.indexOf('User ID');
+            const itemIndex = headers.indexOf('Товар');
+            const priceIndex = headers.indexOf('Сумма');
+            const dateIndex = headers.indexOf('Время');
+            // Для статуса — если нет колонки, добавим заглушку
+            const statusIndex = -1;
+
+            let totalSpent = 0;
+            let orderCount = 0;
+            const history = [];
+
+            rows.forEach(row => {
+                const rowData = row.c.map(cell => cell ? cell.v : '');
+                const userId = String(rowData[userIdIndex]).trim();
+                if (userId === String(user.id)) {
+                    orderCount++;
+                    const price = parseFloat(rowData[priceIndex]) || 0;
+                    totalSpent += price;
+                    history.push({
+                        country: rowData[itemIndex] || 'Неизвестно',
+                        date: rowData[dateIndex] || '',
+                        price: price,
+                        status: 'Выдан' // Если статуса нет, ставим "Выдан" по умолчанию
+                    });
                 }
+            });
+
+            // Обновляем интерфейс
+            document.getElementById('profile-balance').textContent = '0 ₽';
+            document.getElementById('stat-orders').textContent = orderCount;
+            document.getElementById('stat-accounts').textContent = history.length;
+            document.getElementById('stat-spent').textContent = totalSpent + ' ₽';
+            document.getElementById('stat-topup').textContent = '0 ₽';
+
+            if (history.length === 0) {
+                document.getElementById('history-list').innerHTML = '<div style="text-align:center; color:#6b7280; font-size:14px; padding:20px 0;">Нет покупок</div>';
             } else {
-                console.error('Ошибка ответа от бота');
-                document.getElementById('history-list').innerHTML = '<div style="text-align:center; color:#6b7280; font-size:14px; padding:20px 0;">Ошибка соединения с ботом</div>';
+                const historyHtml = history.map(item => `
+                    <div class="history-item">
+                        <div>
+                            <div class="country">${item.country}</div>
+                            <div class="date">${item.date}</div>
+                        </div>
+                        <div>
+                            <div class="hprice">${item.price} ₽</div>
+                            <div class="status status-issued">${item.status}</div>
+                        </div>
+                    </div>
+                `).join('');
+                document.getElementById('history-list').innerHTML = historyHtml;
             }
+
         } catch (error) {
-            console.error('Общая ошибка:', error);
+            console.error('Ошибка:', error);
             document.getElementById('profile-name').textContent = 'Ошибка загрузки';
+            document.getElementById('history-list').innerHTML = '<div style="text-align:center; color:#6b7280; font-size:14px; padding:20px 0;">Ошибка соединения с таблицей</div>';
         }
     }
 
