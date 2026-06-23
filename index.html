@@ -176,9 +176,22 @@
         </div>
     </div>
 
-    <script>
+<script>
     // Прямая ссылка на опубликованную таблицу
     const PUBLISHED_SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSs_-DOjtnWuxZ-76wHAk1_ZjPubceaCPB_BlzDOUljY59oK16Oscv9FdCk25FdjDrTtNuUKUmeuPVL/pubhtml';
+
+    // Функция переключения вкладок
+    function switchPage(pageId, element) {
+        document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
+        document.getElementById('page-' + pageId).classList.add('active');
+        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+        if(element) element.classList.add('active');
+
+        // Если переключились на профиль — загружаем данные
+        if (pageId === 'profile') {
+            loadProfileData();
+        }
+    }
 
     async function loadProfileData() {
         try {
@@ -202,13 +215,11 @@
             const rows = json.table.rows;
             const headers = json.table.cols.map(col => col.label);
 
-            // Определяем индексы колонок (по названиям в твоей таблице)
+            // Определяем индексы колонок
             const userIdIndex = headers.indexOf('User ID');
             const itemIndex = headers.indexOf('Товар');
             const priceIndex = headers.indexOf('Сумма');
             const dateIndex = headers.indexOf('Время');
-            // Для статуса — если нет колонки, добавим заглушку
-            const statusIndex = -1;
 
             let totalSpent = 0;
             let orderCount = 0;
@@ -225,12 +236,11 @@
                         country: rowData[itemIndex] || 'Неизвестно',
                         date: rowData[dateIndex] || '',
                         price: price,
-                        status: 'Выдан' // Если статуса нет, ставим "Выдан" по умолчанию
+                        status: 'Выдан'
                     });
                 }
             });
 
-            // Обновляем интерфейс
             document.getElementById('profile-balance').textContent = '0 ₽';
             document.getElementById('stat-orders').textContent = orderCount;
             document.getElementById('stat-accounts').textContent = history.length;
@@ -262,6 +272,11 @@
         }
     }
 
-    // Загружаем данные при открытии страницы Профиля
-    document.addEventListener('DOMContentLoaded', loadProfileData);
+    // Загружаем данные при открытии страницы Профиля (первый раз)
+    document.addEventListener('DOMContentLoaded', () => {
+        // Если открыта страница профиля — загружаем
+        if (document.getElementById('page-profile').classList.contains('active')) {
+            loadProfileData();
+        }
+    });
 </script>
