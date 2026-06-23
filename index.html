@@ -176,7 +176,7 @@
         </div>
     </div>
 
-<script>
+    <script>
     // Прямая ссылка на опубликованную таблицу
     const PUBLISHED_SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSs_-DOjtnWuxZ-76wHAk1_ZjPubceaCPB_BlzDOUljY59oK16Oscv9FdCk25FdjDrTtNuUKUmeuPVL/pubhtml';
 
@@ -193,6 +193,7 @@
         }
     }
 
+    // Загрузка данных профиля из таблицы
     async function loadProfileData() {
         try {
             const user = window.Telegram?.WebApp?.initDataUnsafe?.user;
@@ -206,7 +207,7 @@
             document.getElementById('profile-name').textContent = user.first_name || 'Пользователь';
             document.getElementById('profile-id').textContent = 'ID: ' + user.id;
 
-            // Читаем данные из опубликованной таблицы
+            // Получаем данные из таблицы
             const url = PUBLISHED_SHEET_URL.replace('/pubhtml', '/gviz/tq?tqx=out:json');
             const response = await fetch(url);
             const raw = await response.text();
@@ -215,7 +216,7 @@
             const rows = json.table.rows;
             const headers = json.table.cols.map(col => col.label);
 
-            // Определяем индексы колонок
+            // Индексы колонок
             const userIdIndex = headers.indexOf('User ID');
             const itemIndex = headers.indexOf('Товар');
             const priceIndex = headers.indexOf('Сумма');
@@ -241,6 +242,7 @@
                 }
             });
 
+            // Обновляем интерфейс
             document.getElementById('profile-balance').textContent = '0 ₽';
             document.getElementById('stat-orders').textContent = orderCount;
             document.getElementById('stat-accounts').textContent = history.length;
@@ -272,11 +274,12 @@
         }
     }
 
-    // Загружаем данные при открытии страницы Профиля (первый раз)
+    // Загружаем данные при открытии страницы
     document.addEventListener('DOMContentLoaded', () => {
-        // Если открыта страница профиля — загружаем
         if (document.getElementById('page-profile').classList.contains('active')) {
             loadProfileData();
         }
     });
-</script>
+    </script>
+</body>
+</html>
