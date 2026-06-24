@@ -3,6 +3,7 @@
 <head>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script> const tg = window.Telegram.WebApp; </script>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>MaxMagaz</title>
@@ -45,6 +46,7 @@
         .news-item h3 { font-size: 18px; margin-bottom: 8px; }
         .news-item p { font-size: 14px; color: #9ca3af; line-height: 1.5; }
 
+        /* ПРОФИЛЬ И СТАТИСТИКА */
         .profile-header { background: #141414; border-radius: 20px; padding: 25px; text-align: center; border: 1px solid #222; margin-bottom: 20px; }
         .avatar { width: 70px; height: 70px; border-radius: 50%; background: linear-gradient(135deg, #d946ef, #a855f7); margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; font-size: 28px; }
         .profile-name { font-size: 20px; font-weight: 700; }
@@ -57,6 +59,7 @@
         .stat-card .val { font-size: 18px; font-weight: 700; margin-top: 4px; color: #d946ef; }
         .stat-card .lbl { font-size: 11px; color: #6b7280; }
 
+        /* Блок истории покупок */
         .history-list { display: flex; flex-direction: column; gap: 10px; }
         .history-item { background: #141414; border-radius: 12px; padding: 14px; border: 1px solid #222; display: flex; justify-content: space-between; align-items: center; }
         .history-item .country { font-weight: 600; font-size: 14px; }
@@ -76,7 +79,7 @@
 </head>
 <body>
 
-    <!-- ================= КАТАЛОГ (ГЛАВНАЯ) ================= -->
+    <!-- ================= СТРАНИЦА: КАТАЛОГ (ГЛАВНАЯ) ================= -->
     <div id="page-catalog" class="page active">
         <div class="header">
             <div class="logo">MaxMagaz</div>
@@ -112,7 +115,7 @@
         </div>
     </div>
 
-    <!-- ================= НОВОСТИ ================= -->
+    <!-- ================= СТРАНИЦА: НОВОСТИ ================= -->
     <div id="page-news" class="page">
         <div class="header"><div class="logo">📰 Новости</div></div>
         <div class="news-container">
@@ -129,7 +132,7 @@
         </div>
     </div>
 
-    <!-- ================= ПРОФИЛЬ ================= -->
+    <!-- ================= СТРАНИЦА: ПРОФИЛЬ ================= -->
     <div id="page-profile" class="page">
         <div class="header"><div class="logo">👤 Профиль</div></div>
         
@@ -156,37 +159,31 @@
         <div class="footer-info">Бузмаков Максим Витальевич<br>ИНН: 422312373598</div>
     </div>
 
-    <!-- ================= НИЖНЯЯ ПАНЕЛЬ ================= -->
+    <!-- ================= НИЖНЯЯ ПАНЕЛЬ (НОВЫЙ ПОРЯДОК) ================= -->
     <div class="bottom-nav">
-        <div class="nav-item active" data-page="catalog"><span class="icon">📱</span>Каталог</div>
-        <div class="nav-item" data-page="news"><span class="icon">📰</span>Новости</div>
-        <div class="nav-item" data-page="profile"><span class="icon">👤</span>Профиль</div>
-        <div class="nav-item" data-page="pay"><span class="icon">💳</span>Оплата</div>
+        <div class="nav-item active" onclick="switchPage('catalog', this)">
+            <div class="icon">📱</div><div>Каталог</div>
+        </div>
+        <div class="nav-item" onclick="switchPage('news', this)">
+            <div class="icon">📰</div><div>Новости</div>
+        </div>
+        <div class="nav-item" onclick="window.open('https://t.me/maxmagazbot', '_blank')">
+            <div class="icon">💳</div><div>Оплата</div>
+        </div>
+        <div class="nav-item" onclick="switchPage('profile', this)">
+            <div class="icon">👤</div><div>Профиль</div>
+        </div>
     </div>
 
     <script>
-        // ======= ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК =======
-        document.querySelectorAll('.nav-item').forEach(item => {
-            item.addEventListener('click', function() {
-                const pageId = this.dataset.page;
-                
-                document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
-                const targetPage = document.getElementById('page-' + pageId);
-                if (targetPage) targetPage.classList.add('active');
-                
-                document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-                this.classList.add('active');
+        function switchPage(pageId, element) {
+            document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
+            document.getElementById('page-' + pageId).classList.add('active');
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            if(element) element.classList.add('active');
+        }
 
-                if (pageId === 'pay') {
-                    window.open('https://t.me/maxmagazbot', '_blank');
-                }
-                if (pageId === 'profile') {
-                    loadProfileData();
-                }
-            });
-        });
-
-        // ======= ПОЛЗУНОК ЗВЁЗД =======
+        // Ползунок Звезд
         const slider = document.getElementById('starsSlider');
         const countDisplay = document.getElementById('starsCount');
         const totalDisplay = document.getElementById('starsTotal');
@@ -203,69 +200,60 @@
         slider.addEventListener('input', updateStars);
         updateStars();
 
-        // ======= ЗАГРУЗКА ПРОФИЛЯ ИЗ ТАБЛИЦЫ =======
+        // ======= ЗАГРУЗКА ДАННЫХ ИЗ GOOGLE SHEETS (ПРЯМОЙ ПАРСИНГ) =======
         async function loadProfileData() {
             try {
                 const user = window.Telegram?.WebApp?.initDataUnsafe?.user;
                 if (!user) {
                     document.getElementById('profile-name').textContent = 'Откройте через бота';
                     document.getElementById('profile-id').textContent = 'Авторизация...';
-                    document.getElementById('history-list').innerHTML = '<div style="text-align:center; color:#6b7280; font-size:14px; padding:20px 0;">Войдите через бота</div>';
                     return;
                 }
-
                 document.getElementById('profile-name').textContent = user.first_name || 'Пользователь';
                 document.getElementById('profile-id').textContent = 'ID: ' + user.id;
 
-                // Прямая ссылка на CSV листа "Заказы"
-                const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSs_-DOjtnWuxZ-76wHAk1_ZjPubceaCPB_BIzDOUljY59oK16Oscy9FdCk25FdjDrTtNuUKUmeuPVL/pub?gid=1338692489&single=true&output=csv';
+                // Загружаем таблицу из публичного URL (CSV-формат)
+                const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSs_-DOjtnWuxZ-76wHAk1_ZjPubceaCPB_BIzDOUljY59oK16Oscy9FdCk25FdjDrTtNuUKUmeuPVL/pub?gid=1338692489&single=true&output=csv";
                 const response = await fetch(csvUrl);
                 const csvText = await response.text();
 
+                // Парсим CSV
                 const rows = csvText.trim().split('\n').map(row => row.split(','));
                 if (rows.length < 2) {
                     document.getElementById('history-list').innerHTML = '<div style="text-align:center; color:#6b7280; font-size:14px; padding:20px 0;">Данные не найдены</div>';
                     return;
                 }
 
-                // Ищем колонки по заголовкам
-                const headers = rows[0];
-                const userIdIdx = headers.indexOf('User ID');
-                const countryIdx = headers.indexOf('Товар');
-                const priceIdx = headers.indexOf('Сумма');
-                const dateIdx = headers.indexOf('Время');
-
-                // Фильтруем заказы пользователя
-                const userOrders = rows.slice(1).filter(row => {
-                    const userId = row[userIdIdx] ? row[userIdIdx].trim() : '';
-                    return userId === String(user.id);
-                });
-
+                // Предполагаем, что заголовки: 0 - Telegram ID, 1 - Страна, 2 - Цена, 3 - Дата, 4 - Статус
+                const userOrders = rows.slice(1).filter(row => row[0] && row[0].trim() === String(user.id));
+                
                 if (userOrders.length === 0) {
                     document.getElementById('history-list').innerHTML = '<div style="text-align:center; color:#6b7280; font-size:14px; padding:20px 0;">У вас пока нет покупок</div>';
+                    document.getElementById('profile-balance').textContent = '0 ₽';
                     document.getElementById('stat-orders').textContent = '0';
                     return;
                 }
 
-                // Статистика
+                // Считаем статистику
                 let totalSpent = 0;
                 userOrders.forEach(order => {
-                    const price = parseFloat(order[priceIdx]) || 0;
+                    const price = parseInt(order[2]) || 0;
                     totalSpent += price;
                 });
 
-                document.getElementById('profile-balance').textContent = '0 ₽';
+                document.getElementById('profile-balance').textContent = '0 ₽'; // Баланс пока заглушка, если нет в таблице
                 document.getElementById('stat-orders').textContent = userOrders.length;
                 document.getElementById('stat-accounts').textContent = userOrders.length;
                 document.getElementById('stat-spent').textContent = totalSpent + ' ₽';
                 document.getElementById('stat-topup').textContent = '0 ₽';
 
-                // История
+                // Генерируем HTML истории
                 const historyHtml = userOrders.map(order => {
-                    const country = order[countryIdx] || 'Неизвестно';
-                    const price = order[priceIdx] || '0';
-                    const date = order[dateIdx] || 'Не указана';
-                    const status = 'Выдан';
+                    const country = order[1] || 'Неизвестно';
+                    const price = order[2] || '0';
+                    const date = order[3] || 'Не указана';
+                    const status = (order[4] || 'Ожидает').trim();
+                    const statusClass = status === 'Выдан' ? 'status-issued' : 'status-pending';
                     return `
                         <div class="history-item">
                             <div>
@@ -274,7 +262,7 @@
                             </div>
                             <div>
                                 <div class="hprice">${price} ₽</div>
-                                <div class="status status-issued">${status}</div>
+                                <div class="status ${statusClass}">${status}</div>
                             </div>
                         </div>
                     `;
@@ -283,17 +271,13 @@
                 document.getElementById('history-list').innerHTML = historyHtml;
 
             } catch (error) {
-                console.error('Ошибка:', error);
-                document.getElementById('history-list').innerHTML = '<div style="text-align:center; color:#6b7280; font-size:14px; padding:20px 0;">Ошибка соединения с таблицей</div>';
+                console.error('Ошибка загрузки данных:', error);
+                document.getElementById('history-list').innerHTML = '<div style="text-align:center; color:#6b7280; font-size:14px; padding:20px 0;">Ошибка загрузки истории</div>';
             }
         }
 
-        // Загружаем профиль при открытии страницы
-        document.addEventListener('DOMContentLoaded', () => {
-            if (document.getElementById('page-profile').classList.contains('active')) {
-                loadProfileData();
-            }
-        });
+        // Загружаем данные при открытии страницы Профиля
+        document.addEventListener('DOMContentLoaded', loadProfileData);
     </script>
 </body>
 </html>
